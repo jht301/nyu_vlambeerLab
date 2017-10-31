@@ -11,29 +11,77 @@ using UnityEngine;
 
 public class Pathmaker : MonoBehaviour {
 
-// STEP 2: ============================================================================================
-// translate the pseudocode below
+    // STEP 2: ============================================================================================
+    // translate the pseudocode below
 
-//	DECLARE CLASS MEMBER VARIABLES:
-//	Declare a private integer called counter that starts at 0; 		// counter var will track how many floor tiles I've instantiated
-//	Declare a public Transform called floorPrefab, assign the prefab in inspector;
-//	Declare a public Transform called pathmakerSpherePrefab, assign the prefab in inspector; 		// you'll have to make a "pathmakerSphere" prefab later
+    //	DECLARE CLASS MEMBER VARIABLES:
+    private int counter = 0;
+    //	Declare a private integer called counter that starts at 0; 		// counter var will track how many floor tiles I've instantiated
+    public Transform squareFloor;
+    public Transform floorPrefab;
+    public Transform triangleFloor;
+    public Transform sphereFloor;
+    //	Declare a public Transform called floorPrefab, assign the prefab in inspector;
+    public Transform pathmakerSpherePrefab;
+    //	Declare a public Transform called pathmakerSpherePrefab, assign the prefab in inspector; 		// you'll have to make a "pathmakerSphere" prefab later
+    public int maxTiles;
+    Transform[] floors;
+    float turnLeft;
+    float turnRight;
+
+    void Start() {
+        turnLeft = Random.Range(.05f, .1f);
+        turnRight = Random.Range(.35f, .4f);
+        floors = new Transform[4];
+        floors[0] = squareFloor;
+        floors[1] = floorPrefab;
+        floors[2] = sphereFloor;
+        floors[3] = triangleFloor;
+    }
+
+    void Update () {
+        if (counter < 50) {
+            float i = Random.Range(0.0f, 1.0f);
+            if(i <turnLeft) {
+                this.transform.eulerAngles += new Vector3(0, 90);
+            }else if(i>=.3f && i < turnRight) {
+                this.transform.eulerAngles -= new Vector3(0, 90);
+            }else if(i>=.95f && i < 1.0f) {
+                Instantiate(pathmakerSpherePrefab, this.transform.position, Quaternion.identity);
+            }
+            int x = Random.Range(0, 4);
+            if (Physics.CheckSphere(this.transform.position, .1f)) {
+                transform.position += transform.forward * 5;
+            }
+            else {
+                Instantiate(floors[x], this.transform.position, Quaternion.identity);
+                transform.position += transform.forward * 5;
+                managerScript.me.globalTileCount++;
+                counter++;
+            }
 
 
-	void Update () {
-//		If counter is less than 50, then:
-//			Generate a random number from 0.0f to 1.0f;
-//			If random number is less than 0.25f, then rotate myself 90 degrees;
-//				... Else if number is 0.25f-0.5f, then rotate myself -90 degrees;
-//				... Else if number is 0.99f-1.0f, then instantiate a pathmakerSpherePrefab clone at my current position;
-//			// end elseIf
+            
+            
+        }else {
+            Destroy(this.gameObject);
+        }
+        //		If counter is less than 50, then:
+        //			Generate a random number from 0.0f to 1.0f;
+        //			If random number is less than 0.25f, then rotate myself 90 degrees;
+        //				... Else if number is 0.25f-0.5f, then rotate myself -90 degrees;
+        //				... Else if number is 0.99f-1.0f, then instantiate a pathmakerSpherePrefab clone at my current position;
+        //			// end elseIf
 
-//			Instantiate a floorPrefab clone at current position;
-//			Move forward ("forward", as in, the direction I'm currently facing) by 5 units;
-//			Increment counter;
-//		Else:
-//			Destroy my game object; 		// self destruct if I've made enough tiles already
-	}
+        //			Instantiate a floorPrefab clone at current position;
+        //			Move forward ("forward", as in, the direction I'm currently facing) by 5 units;
+        //			Increment counter;
+        //		Else:
+        //			Destroy my game object; 		// self destruct if I've made enough tiles already
+        if (managerScript.me.globalTileCount >= maxTiles) {
+            Destroy(this.gameObject);
+        }
+    }
 
 } // end of class scope
 
